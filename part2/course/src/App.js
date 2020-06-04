@@ -1,10 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Note from './components/Note'
 
-const App = (props) => {
-  const [notes, setNotes] = useState(props.notes)
+import axios from 'axios'
+
+const App = () => {
+  // 不使用传入的数据，而是使用useEffect获取数据
+  // const [notes, setNotes] = useState(props.notes)
+  const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
+
+  const hook = () => {
+    console.log('use effect')
+    axios.get('http://localhost:3001/notes').then(res => {
+      console.log('promise fulfilled')
+      setNotes(res.data)
+    })
+  }
+
+  // 如果不加第二个参数，useEffect会在每次重新渲染时都执行一次
+  // 第二个参数用于控制useEffect的执行频率
+  useEffect(hook, [])
+  console.log(`render ${notes.length} notes`)
 
   const addNote = (event) => {
     event.preventDefault()
