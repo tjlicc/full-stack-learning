@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Note from './components/Note'
-
-import axios from 'axios'
+import * as noteService from './services/notes'
 
 const App = () => {
   // 不使用传入的数据，而是使用useEffect获取数据
@@ -11,10 +10,14 @@ const App = () => {
   const [showAll, setShowAll] = useState(true)
 
   const hook = () => {
-    console.log('use effect')
-    axios.get('http://localhost:3001/notes').then(res => {
-      console.log('promise fulfilled')
-      setNotes(res.data)
+    noteService.getAll().then(initialNotes => {
+      const nonExisting = {
+        id: 10000,
+        content: 'This note is not saved to server',
+        date: '2019-05-30T17:30:31.098Z',
+        important: true,
+      }
+      setNotes(initialNotes.concat(nonExisting))
     })
   }
 
@@ -29,16 +32,32 @@ const App = () => {
       content: newNote,
       date: new Date().toISOString(),
       important: Math.random() < 0.5,
-      id: notes.length + 1
+      // id应该交由服务器来生成
+      // id: notes.length + 1
     }
 
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
+    // 改成post请求，添加数据
+    // setNotes(notes.concat(noteObject))
+    noteService.create(noteObject).then(returnedNote => {
+      setNotes(notes.concat(returnedNote))
+      setNewNote('')
+    })
+
   }
 
   const handleNoteChange = (event) => {
     console.log(event.target.value)
     setNewNote(event.target.value)
+  }
+
+  const toggleImportanceOf = (note) => {
+    const changedNote = { ...note, important: !note.important }
+    noteService.update(note.id, changedNote).then(returnedNote => {
+      setNotes(notes.map(data => data.id === note.id ? returnedNote : data))
+    }).catch(error => {
+      alert(`the note ${note.content} was already deleted from server`)
+      setNotes(notes.filter(data => data.id != note.id))
+    })
   }
 
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
@@ -52,7 +71,7 @@ const App = () => {
       <ul>
         {/* 不建议使用数组下标作为元素的key，这会产生不可预测的问题 */}
         {/* {notes.map((note, i) => <li key={i}>{note.content}</li>)} */}
-        {notesToShow.map(note => <Note key={note.id} note={note} />)}
+        {notesToShow.map(note => <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note)} />)}
       </ul>
       <form onSubmit={addNote}>
         <input type="text" value={newNote} onChange={handleNoteChange} />
