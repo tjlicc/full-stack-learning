@@ -15,13 +15,10 @@ const PersonForm = ({ onSubmit }) => {
       name: newName,
       number: newNumber
     }
-    const success = onSubmit(newPerson)
-    if (!success) {
-      return
-    } else {
+    onSubmit(newPerson).then(() => {
       setNewName('')
       setNewNumber('')
-    }
+    })
   }
 
   return (
