@@ -1,15 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-const Filter = ({ onChange }) => {
-  const [keyword, setKeyword] = useState('')
-
-  const handleKeywordChange = (event) => {
-    setKeyword(event.target.value)
-    onChange(event.target.value)
-  }
-
+const Filter = ({ keyword, onChange }) => {
   return (
-    <div>fitler shown with <input type="text" value={keyword} onChange={handleKeywordChange} /></div>
+    <div>fitler shown with <input type="text" value={keyword} onChange={onChange} /></div>
   )
 }
 

@@ -16,27 +16,40 @@ const App = () => {
   // ])
   const [keyword, setKeyword] = useState('')
   const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
   const [notification, setNotification] = useState({
     message: null,
     type: 'error',
   })
 
+  // 获取所有数据
   useEffect(() => {
     personService.getAll().then(list => setPersons(list))
   }, [])
 
-  const addPerson = (newPerson) => {
-    const existPerson = persons.find(person => person.name === newPerson.name)
-    if (existPerson) {
-      let confirm = window.confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one?`)
+  // 处理数据搜索
+  const handleFilter = (event) => {
+    setKeyword(event.target.value)
+  }
+
+  // 处理表单相关内容
+  const handleNameChange = event => setNewName(event.target.value)
+  const handleNumberChange = event => setNewNumber(event.target.value)
+  const addPerson = (event) => {
+    event.preventDefault()
+
+    const oldPerson = persons.find(person => person.name === newName)
+    if (oldPerson) {
+      let confirm = window.confirm(`${oldPerson.name} is already added to phonebook, replace the old number with a new one?`)
       if (confirm) {
-        newPerson.id = existPerson.id
-        return personService.update(existPerson.id, newPerson).then(updatedPerson => {
+        oldPerson.number = newNumber
+        return personService.update(oldPerson.id, oldPerson).then(updatedPerson => {
           let copy = [...persons]
-          let index = copy.findIndex(data => data.id === newPerson.id)
+          let index = copy.findIndex(data => data.id === oldPerson.id)
           copy.splice(index, 1, updatedPerson)
           setNotification({
-            message: `Modified ${newPerson.name}`,
+            message: `Modified ${oldPerson.name}`,
             type: 'success',
           })
           setTimeout(() => {
@@ -45,10 +58,11 @@ const App = () => {
             })
           }, 2000)
           setPersons(copy)
-          return true
-        }, error => {
+          setNewName('')
+          setNewNumber('')
+        }, () => {
           setNotification({
-            message: `Information of ${newPerson.name} has been removed from server`,
+            message: `Information of ${newName} has been removed from server`,
             type: 'error',
           })
           setTimeout(() => {
@@ -56,15 +70,15 @@ const App = () => {
               message: null,
             })
           }, 2000)
-          return false
         })
-      } else {
-        return Promise.reject(false)
       }
     }
-    return personService.create(newPerson).then(createdPerson => {
+    return personService.create({
+      name: newName,
+      number: newNumber
+    }).then(createdPerson => {
       setNotification({
-        message: `Added ${newPerson.name}`,
+        message: `Added ${newName}`,
         type: 'success',
       })
       setTimeout(() => {
@@ -73,30 +87,38 @@ const App = () => {
         })
       }, 2000)
       setPersons(persons.concat(createdPerson))
-      return true
+      setNewName('')
+      setNewNumber('')
     })
   }
 
-  const handleFilter = (text) => {
-    setKeyword(text)
-  }
-
-  const handleRemove = (id) => {
-    let copy = [...persons]
-    let index = copy.findIndex(data => data.id === id)
-    copy.splice(index, 1)
-    setPersons(copy)
+  // 处理删除通讯录
+  const handleRemove = (person) => {
+    let confirm = window.confirm(`Delete ${person.name} ?`)
+    if (confirm) {
+      personService.remove(person.id).then(() => {
+        let copy = [...persons]
+        let index = copy.findIndex(data => data.id === person.id)
+        copy.splice(index, 1)
+        setPersons(copy)
+      })
+    }
   }
 
   const shownPersons = keyword ? persons.filter(person => person.name.toLowerCase().indexOf(keyword) !== -1) : persons
-
   return (
     <div>
       <h2>Phonebook</h2>
       <Notification message={notification.message} type={notification.type}></Notification>
       <Filter onChange={handleFilter}></Filter>
       <h3>add a new</h3>
-      <PersonForm onSubmit={addPerson}></PersonForm>
+      <PersonForm
+        newName={newName}
+        newNumber={newNumber}
+        onNameChange={handleNameChange}
+        onNumberChange={handleNumberChange}
+        onSubmit={addPerson}
+      ></PersonForm>
       <h3>Numbers</h3>
       <Persons persons={shownPersons} onRemove={handleRemove}></Persons>
     </div>
