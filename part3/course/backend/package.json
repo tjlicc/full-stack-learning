@@ -6,6 +6,7 @@
   "scripts": {
     "build:ui": "rm -rf build && cd ../../../part2/course && npm run build && cp -r build ../../part3/course/backend",
     "start": "node index.js",
+    "debug": "node --inspect index.js",
     "dev": "node_modules/.bin/nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

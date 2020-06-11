@@ -1,8 +1,8 @@
 ### 获取所有便签
-GET http://localhost:3000/api/notes
+GET http://localhost:3001/api/notes
 
 ### 创建新的便签
-POST http://localhost:3000/api/notes
+POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
@@ -11,4 +11,4 @@ Content-Type: application/json
 }
 
 ### 访问不存在的接口
-GET http://localhost:3000/api/unkown
+GET http://localhost:3001/api/unkown
