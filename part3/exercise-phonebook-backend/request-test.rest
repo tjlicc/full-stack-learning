@@ -1,0 +1,20 @@
+### 获取请求信息
+GET http://localhost:3001/info
+
+### 获取所有联系人
+GET http://localhost:3001/api/persons
+
+### 创建单个联系人
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "licc",
+  "number": 123456
+}
+
+### 获取单个联系人
+GET http://localhost:3001/api/persons/10
+
+### 删除单个联系人
+DELETE  http://localhost:3001/api/persons/10
