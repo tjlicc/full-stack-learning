@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 
 let notes = [
   {
@@ -41,6 +42,8 @@ const unkownEndpoint = (req, res) => {
 const app = express()
 app.use(express.json())
 app.use(requestLogger)
+app.use(cors())
+app.use(express.static('build'))
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World</h1>')
@@ -88,10 +91,21 @@ app.delete('/api/notes/:id', (req, res) => {
     res.status(404).end()
   }
 })
+app.put('/api/notes/:id', (req, res) => {
+  const body = req.body
+  const id = body.id
+  const index = notes.findIndex(data => data.id === id)
+  if (index != -1) {
+    notes.splice(index, 1, body)
+    res.json(body)
+  } else {
+    res.status(404).end()
+  }
+})
 
 app.use(unkownEndpoint)
 
-const port = 3000
+const port = 3001
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
 })

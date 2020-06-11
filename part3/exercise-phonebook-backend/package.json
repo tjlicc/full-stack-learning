@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:ui": "rm -rf build && cd ../../part2/exercise-phonebook && npm run build && cp -r build ../../part3/exercise-phonebook-backend",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "./node_modules/.bin/nodemon index.js",
     "start": "node index.js"
