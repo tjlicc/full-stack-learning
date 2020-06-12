@@ -66,6 +66,8 @@ const errorHandler = (err, req, res, next) => {
 
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     return res.status(400).send({ error: 'malformatted id' })
+  } else if (err.name === 'ValidationError') {
+    return res.status(400).send({ error: err.message })
   }
 
   next()
@@ -76,7 +78,7 @@ const app = express()
 app.use(express.static('build'))
 app.use(express.json())
 
-morgan.token('body', (req, res) => JSON.stringify(req.body))
+morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 // 创建路由
@@ -98,17 +100,17 @@ app.post('/api/persons', (req, res, next) => {
 
   if (!body.name) {
     return res.status(400).json({
-      error: "name is missing"
+      error: 'name is missing'
     })
   }
   // if (persons.some(data => data.name === body.name)) {
   //   return res.status(400).json({
-  //     error: "name must be unique"
+  //     error: 'name must be unique'
   //   })
   // }
   if (!body.number) {
     return res.status(400).json({
-      error: "number is missing"
+      error: 'number is missing'
     })
   }
 
@@ -133,17 +135,17 @@ app.put('/api/persons/:id', (req, res, next) => {
 
   if (!body.name) {
     return res.status(400).json({
-      error: "name is missing"
+      error: 'name is missing'
     })
   }
   // if (persons.some(data => data.name === body.name)) {
   //   return res.status(400).json({
-  //     error: "name must be unique"
+  //     error: 'name must be unique'
   //   })
   // }
   if (!body.number) {
     return res.status(400).json({
-      error: "number is missing"
+      error: 'number is missing'
     })
   }
 
@@ -152,7 +154,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     name: body.name,
     number: body.number || '',
   }
-  Person.findByIdAndUpdate(req.params.id, person, { new: true }).then(updatedPerson => res.json(updatedPerson)).catch(err => next(err))
+  Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true }).then(updatedPerson => res.json(updatedPerson)).catch(err => next(err))
 })
 app.get('/api/persons/:id', (req, res, next) => {
   // const id = +req.params.id
@@ -174,7 +176,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
   //   res.status(404).end()
   // }
 
-  Person.findByIdAndRemove(req.params.id).then(result => res.status(204).end()).catch(err => next(err))
+  Person.findByIdAndRemove(req.params.id).then(() => res.status(204).end()).catch(err => next(err))
 })
 
 app.use(errorHandler)

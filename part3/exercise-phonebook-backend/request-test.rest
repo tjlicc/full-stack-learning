@@ -14,12 +14,12 @@ Content-Type: application/json
 }
 
 ### 更新某个人的信息
-PUT http://localhost:3001/api/persons/5ee2f375e5932012c6f014f5a
+PUT http://localhost:3001/api/persons/5ee2f375e5932012c6f014f5
 Content-Type: application/json
 
 {
   "name": "licc",
-  "number": 123456789
+  "number": 123
 }
 
 

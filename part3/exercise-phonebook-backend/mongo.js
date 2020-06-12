@@ -5,11 +5,11 @@ if (process.argv.length < 3) {
   process.exit(1)
 }
 
-const password = encodeURI(process.argv[2])
+// const password = encodeURI(process.argv[2])
 const name = process.argv[3]
 const number = process.argv[4]
 
-const url = `mongodb://127.0.0.1:27017/phonebook`
+const url = 'mongodb://127.0.0.1:27017/phonebook'
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 
@@ -24,7 +24,7 @@ if (name) {
     name: name,
     number: number
   })
-  person.save().then(res => {
+  person.save().then(() => {
     console.log(`added ${name} number ${number} to phonebook`)
     mongoose.connection.close()
   })

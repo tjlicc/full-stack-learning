@@ -3,26 +3,26 @@ const express = require('express')
 const cors = require('cors')
 const Note = require('./models/note')
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true
-  }
-]
+// let notes = [
+//   {
+//     id: 1,
+//     content: "HTML is easy",
+//     date: "2019-05-30T17:30:31.098Z",
+//     important: true
+//   },
+//   {
+//     id: 2,
+//     content: "Browser can execute only Javascript",
+//     date: "2019-05-30T18:39:34.091Z",
+//     important: false
+//   },
+//   {
+//     id: 3,
+//     content: "GET and POST are the most important methods of HTTP protocol",
+//     date: "2019-05-30T19:20:14.298Z",
+//     important: true
+//   }
+// ]
 
 // const generateId = () => {
 //   const maxId = notes.length > 0 ? Math.max(...notes.map(data => data.id)) : 0
@@ -42,6 +42,8 @@ const errorHandler = (err, request, response, next) => {
 
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (err.name === 'ValidationError') {
+    return response.status(400).json({ error: err.message })
   }
 
   next()
@@ -64,14 +66,14 @@ app.get('/api/notes', (req, res) => {
   // res.json(notes)
   Note.find().then((notes) => res.json(notes))
 })
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (req, res, next) => {
   const body = req.body
 
-  if (!body.content) {
-    return res.status(400).json({
-      error: 'content missing'
-    })
-  }
+  // if (!body.content) {
+  //   return res.status(400).json({
+  //     error: 'content missing'
+  //   })
+  // }
 
   // const note = {
   //   content: body.content,
@@ -87,7 +89,7 @@ app.post('/api/notes', (req, res) => {
     important: body.important || false,
     date: new Date()
   })
-  note.save().then(savedNote => res.json(savedNote))
+  note.save().then(savedNote => res.json(savedNote)).catch(err => next(err))
 })
 
 app.get('/api/notes/:id', (req, res, next) => {
@@ -117,7 +119,7 @@ app.delete('/api/notes/:id', (req, res, next) => {
   //   res.status(404).end()
   // }
 
-  Note.findByIdAndRemove(req.params.id).then(result => {
+  Note.findByIdAndRemove(req.params.id).then(() => {
     res.status(204).end
   }).catch(err => next(err))
 })
@@ -137,7 +139,7 @@ app.put('/api/notes/:id', (req, res, next) => {
     content: body.content,
     important: body.important,
   }
-  Note.findByIdAndUpdate(req.params.id, note, {new: true}).then(updatedNote => res.json(updatedNote)).catch(err => next(err))
+  Note.findByIdAndUpdate(req.params.id, note, { new: true }).then(updatedNote => res.json(updatedNote)).catch(err => next(err))
 })
 
 app.use(unkownEndpoint)
