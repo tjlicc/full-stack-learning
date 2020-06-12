@@ -13,8 +13,18 @@ Content-Type: application/json
   "number": 123456
 }
 
+### 更新某个人的信息
+PUT http://localhost:3001/api/persons/5ee2f375e5932012c6f014f5a
+Content-Type: application/json
+
+{
+  "name": "licc",
+  "number": 123456789
+}
+
+
 ### 获取单个联系人
-GET http://localhost:3001/api/persons/10
+GET http://localhost:3001/api/persons/5ee2f360e202cb12bef93b08
 
 ### 删除单个联系人
-DELETE  http://localhost:3001/api/persons/10
+DELETE  http://localhost:3001/api/persons/5ee2f360e202cb12bef93b08

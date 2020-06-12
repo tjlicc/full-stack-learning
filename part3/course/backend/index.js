@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const Note = require('./models/note')
 
 let notes = [
   {
@@ -22,10 +24,10 @@ let notes = [
   }
 ]
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map(data => data.id)) : 0
-  return maxId + 1
-}
+// const generateId = () => {
+//   const maxId = notes.length > 0 ? Math.max(...notes.map(data => data.id)) : 0
+//   return maxId + 1
+// }
 
 const requestLogger = (req, res, next) => {
   console.log('Method: ', req.method)
@@ -35,21 +37,32 @@ const requestLogger = (req, res, next) => {
   next()
 }
 
+const errorHandler = (err, request, response, next) => {
+  console.log(err)
+
+  if (err.name === 'CastError' && err.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next()
+}
+
 const unkownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unkown endpoint' })
 }
 
 const app = express()
+app.use(express.static('build'))
 app.use(express.json())
 app.use(requestLogger)
 app.use(cors())
-app.use(express.static('build'))
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World</h1>')
 })
 app.get('/api/notes', (req, res) => {
-  res.json(notes)
+  // res.json(notes)
+  Note.find().then((notes) => res.json(notes))
 })
 app.post('/api/notes', (req, res) => {
   const body = req.body
@@ -60,52 +73,77 @@ app.post('/api/notes', (req, res) => {
     })
   }
 
-  const note = {
+  // const note = {
+  //   content: body.content,
+  //   important: body.important || false,
+  //   date: new Date(),
+  //   id: generateId()
+  // }
+  // notes = notes.concat(note)
+
+  // res.json(note)
+  const note = new Note({
     content: body.content,
     important: body.important || false,
-    date: new Date(),
-    id: generateId()
-  }
-  notes = notes.concat(note)
-
-  res.json(note)
+    date: new Date()
+  })
+  note.save().then(savedNote => res.json(savedNote))
 })
 
-app.get('/api/notes/:id', (req, res) => {
-  const id = +req.params.id
-  const note = notes.find(data => data.id === id)
+app.get('/api/notes/:id', (req, res, next) => {
+  // const id = +req.params.id
+  // const note = notes.find(data => data.id === id)
 
-  if (note) {
-    res.json(note)
-  } else {
-    res.status(404).end()
-  }
+  // if (note) {
+  //   res.json(note)
+  // } else {
+  //   res.status(404).end()
+  // }
+  Note.findById(req.params.id).then(note => {
+    if (note) {
+      res.json(note)
+    } else {
+      res.status(404).end()
+    }
+  }).catch(err => next(err))
 })
-app.delete('/api/notes/:id', (req, res) => {
-  const id = +req.params.id
-  const index = notes.findIndex(data => data.id === id)
-  if (index != -1) {
-    notes.splice(index, 1)
-    res.status(204).end()
-  } else {
-    res.status(404).end()
-  }
+app.delete('/api/notes/:id', (req, res, next) => {
+  // const id = +req.params.id
+  // const index = notes.findIndex(data => data.id === id)
+  // if (index != -1) {
+  //   notes.splice(index, 1)
+  //   res.status(204).end()
+  // } else {
+  //   res.status(404).end()
+  // }
+
+  Note.findByIdAndRemove(req.params.id).then(result => {
+    res.status(204).end
+  }).catch(err => next(err))
 })
-app.put('/api/notes/:id', (req, res) => {
+app.put('/api/notes/:id', (req, res, next) => {
+  // const body = req.body
+  // const id = body.id
+  // const index = notes.findIndex(data => data.id === id)
+  // if (index != -1) {
+  //   notes.splice(index, 1, body)
+  //   res.json(body)
+  // } else {
+  //   res.status(404).end()
+  // }
+
   const body = req.body
-  const id = body.id
-  const index = notes.findIndex(data => data.id === id)
-  if (index != -1) {
-    notes.splice(index, 1, body)
-    res.json(body)
-  } else {
-    res.status(404).end()
+  const note = {
+    content: body.content,
+    important: body.important,
   }
+  Note.findByIdAndUpdate(req.params.id, note, {new: true}).then(updatedNote => res.json(updatedNote)).catch(err => next(err))
 })
 
 app.use(unkownEndpoint)
+app.use(errorHandler)
 
-const port = 3001
+const port = process.env.PORT || 3000
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)
 })
