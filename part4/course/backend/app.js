@@ -22,8 +22,6 @@ app.use('/api/notes', notesRouter)
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
-console.log('config completed')
-
 module.exports = app
 
 

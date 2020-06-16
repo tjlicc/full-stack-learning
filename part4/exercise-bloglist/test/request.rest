@@ -1,0 +1,13 @@
+### 获取所有博客列表
+GET http://localhost:3003/api/blogs
+
+### 新增博客内容
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "标题",
+  "author": "作者",
+  "url": "http://www.baidu.com",
+  "likes": 190
+}
