@@ -87,6 +87,47 @@ test('blog without url and title will not be saved', async () => {
     .expect(400)
 })
 
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    expect(blogsAtEnd).toHaveLength(
+      helper.initialBlogs.length - 1
+    )
+
+    const ids = blogsAtEnd.map(r => r.id)
+
+    expect(ids).not.toContain(blogToDelete.id)
+  })
+})
+
+describe('modify of a blog', () => {
+  test('modify a blog\'s likes', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToModify = blogsAtStart[0]
+
+    await api
+      .put(`/api/blogs/${blogToModify.id}`)
+      .send({
+        likes: 1000
+      })
+      .expect(200)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const blogBeModified = blogsAtEnd[0]
+
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    expect(blogBeModified.likes).toBe(1000)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
