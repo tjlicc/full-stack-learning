@@ -2,7 +2,7 @@
 GET http://localhost:3001/api/notes
 
 ### 获取单个便签
-GET http://localhost:3001/api/notes/5ee219bbc96d5d5e611a9e2d
+GET http://localhost:3001/api/notes/5ef474ab95267f19feca900d
 
 ### 删除单个便签
 DELETE http://localhost:3001/api/notes/5ee219bbc96d5d5e611a9e2d
@@ -12,8 +12,22 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-  # "content": "Browser can execute only Javascript",
-  "date": "2019-05-30T18:39:34.091Z"
+  "content": "Browser can execute only Javascript",
+  "date": "2019-05-30T18:39:34.091Z",
+  "userId": "5ef4741247a115199fab8327"
+}
+
+### 获取用户列表
+GET http://localhost:3001/api/users
+
+### 创建用户
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "root",
+  "name": "Superuser",
+  "password": "123456"
 }
 
 ### 访问不存在的接口
