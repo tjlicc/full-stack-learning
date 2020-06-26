@@ -23,7 +23,7 @@ blogRouter.post('/', async (request, response) => {
   }
 
   blog.likes = blog.likes || 0
-
+  blog.user = decodedToken.id
   const savedBlog = await blog.save()
   const user = await User.findById(blog.user)
   user.blogs = user.blogs.concat(savedBlog._id)
