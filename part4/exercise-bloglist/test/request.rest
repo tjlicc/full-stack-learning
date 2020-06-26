@@ -3,11 +3,40 @@ GET http://localhost:3003/api/blogs
 
 ### 新增博客内容
 POST http://localhost:3003/api/blogs
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjVlZjU4MTY2NGMyMDZiMjlmZjQ1MDhiNiIsImlhdCI6MTU5MzE0ODg2MX0.AIH5Bl3UdP0rnq9Z6onistrUSr69LzMYQISsSxv3k5s
 Content-Type: application/json
 
 {
   "title": "标题",
   "author": "作者",
   "url": "http://www.baidu.com",
-  "likes": 190
+  "likes": 190,
+  "user": "5ef581664c206b29ff4508b6"
+}
+
+### 删除博客
+DELETE http://localhost:3003/api/blogs/5ef585c6b20f7f2db1982123
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjVlZjU4MTY2NGMyMDZiMjlmZjQ1MDhiNiIsImlhdCI6MTU5MzE0ODg2MX0.AIH5Bl3UdP0rnq9Z6onistrUSr69LzMYQISsSxv3k5
+
+
+### 新增用户
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "root",
+  "name": "Superuser",
+  "password": "123456"
+}
+
+### 获取用户列表
+GET http://localhost:3003/api/users
+
+### 用户登录
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+  "username": "root",
+  "password": "123456"
 }
