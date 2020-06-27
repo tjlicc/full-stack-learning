@@ -54,3 +54,8 @@
 .notification.success {
   color: green;
 }
+
+.blog {
+  margin-top: 20px;
+  border: 1px solid #000;
+}

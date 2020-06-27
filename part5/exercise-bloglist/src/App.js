@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './App.css'
@@ -11,9 +13,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -79,15 +78,12 @@ const App = () => {
     setUser(null)
   }
 
-  const createBlog = async (event) => {
-    event.preventDefault()
-
+  const createBlog = async (newBlog) => {
     try {
-      const newBlog = await blogService.create({
-        title, author, url
-      })
+      const returnedBlog = await blogService.create(newBlog)
 
-      setBlogs(blogs.concat(newBlog))
+      noteFormRef.current.toggleVisibility()
+      setBlogs(blogs.concat(returnedBlog))
       setNotification({
         message: 'a new blog added',
         type: 'success'
@@ -106,6 +102,16 @@ const App = () => {
     }
   }
 
+  const handleLikeChange = (newBlog) => {
+    let copy = [...blogs]
+    let index = copy.findIndex(item => item.id === newBlog.id)
+    copy.splice(index, 1, newBlog)
+    copy.sort((item1, item2) => item2.likes - item1.likes)
+    console.log(copy)
+    setBlogs(copy)
+  }
+
+  const noteFormRef = useRef()
   const blogPage = () => {
     return (
       <>
@@ -115,25 +121,13 @@ const App = () => {
           <button onClick={logout}>logout</button>
         </div>
 
-        <h2>create new</h2>
-        <form onSubmit={createBlog}>
-          <div>
-            title:
-            <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} />
-          </div>
-          <div>
-            author:
-            <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} />
-          </div>
-          <div>
-            url:
-            <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} />
-          </div>
-          <button type="submit">create</button>
-        </form>
+        <Togglable ref={noteFormRef} buttonLabel="new note">
+          <h2>create new</h2>
+          <BlogForm createBlog={createBlog}></BlogForm>
+        </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} likeChange={handleLikeChange} />
         )}
       </>
     )

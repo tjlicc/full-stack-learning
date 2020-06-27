@@ -19,4 +19,8 @@ const create = (newObject) => {
   return axios.post(baseUrl, newObject, config).then(res => res.data)
 }
 
-export default { getAll, setToken, create }
+const like = (id, likes) => {
+  return axios.put(`${baseUrl}/${id}`, { likes }).then(res => res.data)
+}
+
+export default { getAll, setToken, create, like }
