@@ -19,13 +19,13 @@ const Blog = ({ blog, likeChange }) => {
   return (
     < div className="blog" >
       {blog.title}
-      <button style={hideWhenVisible} onClick={toggleVisibility}>view</button>
-      <button style={showWhenVisible} onClick={toggleVisibility}>hide</button>
-      <div style={showWhenVisible}>
+      <button style={hideWhenVisible} onClick={toggleVisibility} className="view-btn">view</button>
+      <button style={showWhenVisible} onClick={toggleVisibility} className="hide-btn">hide</button>
+      <div style={showWhenVisible} className="toggledContent">
         <p>url: {blog.url}</p>
         <p>
           likes: {blog.likes}
-          <button onClick={() => addLike(blog.id, blog.likes + 1)}>like</button>
+          <button onClick={() => addLike(blog.id, blog.likes + 1)} className="like-btn">like</button>
         </p>
         <p>author: {blog.author}</p>
       </div>
