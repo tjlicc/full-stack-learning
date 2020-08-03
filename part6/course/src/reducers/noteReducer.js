@@ -1,4 +1,17 @@
-const noteReducer = (state = [], action) => {
+const initialNotes = [
+  {
+    content: 'reducer defines how redux store works',
+    important: true,
+    id: 1,
+  },
+  {
+    content: 'state of store can contain any data',
+    important: false,
+    id: 2,
+  },
+]
+
+const noteReducer = (state = initialNotes, action) => {
   switch (action.type) {
     case 'NEW_NOTE':
       // 不要使用push方法来改变数组，要使用不可变对象
