@@ -5,11 +5,11 @@ import { useDispatch } from 'react-redux'
 const NewNote = () => {
   const dispatch = useDispatch()
 
-  const addNote = (event) => {
+  const addNote = async (event) => {
     event.preventDefault()
-    const note = event.target.note.value
+    const content = event.target.note.value
     event.target.note.value = ''
-    dispatch(createNote(note))
+    dispatch(createNote(content))
   }
 
   return (

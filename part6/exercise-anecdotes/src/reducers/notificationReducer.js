@@ -9,6 +9,20 @@ const reducer = (state = '', action) => {
   }
 }
 
+export const setNotification = (notification, wait = 5) => {
+  return dispatch => {
+    dispatch({
+      type: 'NOTIFY',
+      notification
+    })
+    setTimeout(() => {
+      dispatch({
+        type: 'CANCEL_NOTIFY'
+      })
+    }, wait * 1000)
+  }
+}
+
 export const notify = (notification) => ({
   type: 'NOTIFY',
   notification
