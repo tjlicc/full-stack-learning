@@ -11814,9 +11814,20 @@ react-overlays@^4.1.0:
     uncontrollable "^7.0.0"
     warning "^4.0.3"
 
-react-redux@^7.1.3, react-redux@^7.2.1:
+react-redux@^7.1.3:
   version "7.2.1"
   resolved "https://registry.npm.taobao.org/react-redux/download/react-redux-7.2.1.tgz?cache=0&sync_timestamp=1595763302125&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-redux%2Fdownload%2Freact-redux-7.2.1.tgz#8dedf784901014db2feca1ab633864dee68ad985"
+  integrity sha1-je33hJAQFNsv7KGrYzhk3uaK2YU=
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+    hoist-non-react-statics "^3.3.0"
+    loose-envify "^1.4.0"
+    prop-types "^15.7.2"
+    react-is "^16.9.0"
+
+react-redux@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.npm.taobao.org/react-redux/download/react-redux-7.2.1.tgz#8dedf784901014db2feca1ab633864dee68ad985"
   integrity sha1-je33hJAQFNsv7KGrYzhk3uaK2YU=
   dependencies:
     "@babel/runtime" "^7.5.5"
