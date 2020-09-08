@@ -1,31 +1,32 @@
 const { ApolloServer, UserInputError, gql } = require('apollo-server');
-const { v1: uuid } = require('uuid');
+const mongoose = require('mongoose')
+const Person = require('./models/person')
+const User = require('./models/user')
 
-let persons = [
-  {
-    name: "Arto Hellas",
-    phone: "040-123543",
-    street: "Tapiolankatu 5 A",
-    city: "Espoo",
-    id: "3d594650-3436-11e9-bc57-8b80ba54c431"
-  },
-  {
-    name: "Matti Luukkainen",
-    phone: "040-432342",
-    street: "Malminkaari 10 A",
-    city: "Helsinki",
-    id: '3d599470-3436-11e9-bc57-8b80ba54c431'
-  },
-  {
-    name: "Venla Ruuska",
-    street: "Nallemäentie 22 C",
-    city: "Helsinki",
-    id: '3d599471-3436-11e9-bc57-8b80ba54c431'
-  },
-]
+const MONGODB_URI = 'mongodb://localhost/graphql-course?retryWrites=true'
+
+console.log('connecting to ', MONGODB_URI)
+mongoose.set('useCreateIndex', true)
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connection to MongoDB:', error.message)
+  })
 
 // 创建模式
 const typeDefs = gql`
+  type User {
+    username: String!
+    friends: [Person!]!
+    id: ID!
+  }
+
+  type Token {
+    value: String!
+  }  
+
   type Address {
     street: String!
     city: String!
@@ -47,6 +48,7 @@ const typeDefs = gql`
     personCount: Int!
     allPersons(phone: YesNo): [Person!]!
     findPerson(name: String!): Person
+    me: User
   }
 
   type Mutation {
@@ -56,12 +58,26 @@ const typeDefs = gql`
       street: String!
       city: String!
     ): Person
+    addAsFriend(
+      name: String!
+    ): User
     editNumber(
       name: String!
       phone: String!
     ): Person
+    createUser(
+      username: String!
+    ): User
+    login(
+      username: String!
+      password: String!
+    ): Token
   }  
 `
+
+const jwt = require('jsonwebtoken')
+
+const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
 
 // 创建查询解析器
 const resolvers = {
@@ -75,46 +91,114 @@ const resolvers = {
     }
   },
   Query: {
-    personCount: () => persons.length,
+    personCount: () => Person.collection.countDocuments(),
     allPersons: (parent, args) => {
       if (!args.phone) {
-        return persons
+        return Person.find({})
       }
-      return persons.filter((person) => args.phone === 'YES' ? person.phone : !person.phone);
+      return Person.find({ phone: { $exists: args.phone === 'YES' } })
     },
     // 解析器的参数由graph引擎提供，是固定的四个parent, args, context, info。具体解释可以参考官网链接https://www.apollographql.com/docs/tutorial/resolvers/
     findPerson: (parent, args) => {
-      return persons.find(p => p.name === args.name)
+      return Person.findOne({ name: args.name })
+    },
+    me: (parent, args, context) => {
+      return context.currentUser
     }
   },
   Mutation: {
-    addPerson: (parent, args) => {
-      if (persons.find(p => p.name === args.name)) {
-        throw new UserInputError('Name must be unique', {
-          invalidArgs: args.name
+    addPerson: async (parent, args, { currentUser }) => {
+      const person = new Person({ ...args })
+
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
+
+      try {
+        await person.save()
+        currentUser.friends = currentUser.friends.concat(person)
+        await currentUser.save()
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
         })
       }
-      const person = { ...args, id: uuid() }
-      persons = persons.concat(person)
       return person
     },
-    editNumber: (parent, args) => {
-      const person = persons.find(p => p.name === args.name)
+    addAsFriend: async (root, args, { currentUser }) => {
+      const nonFriendAlready = (person) =>
+        !currentUser.friends.map(f => f._id).includes(person._id)
+        
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
+
+      const person = await Person.findOne({ name: args.name })
+      if (nonFriendAlready(person)) {
+        currentUser.friends = currentUser.friends.concat(person)
+      }
+
+      await currentUser.save()
+
+      return currentUser
+    },
+    editNumber: async (parent, args) => {
+      const person = await Person.findOne({ name: args.name })
       if (!person) {
         return null
       }
 
-      const updatedPerson = { ...person, phone: args.phone }
-      persons = persons.map(p => p.name === args.name ? updatedPerson : p)
-      return updatedPerson
-    }
+      person.phone = args.phone
+      try {
+        await person.save()
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+      return person
+    },
+    createUser: (root, args) => {
+      const user = new User({ username: args.username })
+
+      return user.save()
+        .catch(error => {
+          throw new UserInputError(error.message, {
+            invalidArgs: args,
+          })
+        })
+    },
+    login: async (root, args) => {
+      const user = await User.findOne({ username: args.username })
+
+      if (!user || args.password !== 'secred') {
+        throw new UserInputError("wrong credentials")
+      }
+
+      const userForToken = {
+        username: user.username,
+        id: user._id,
+      }
+
+      return { value: jwt.sign(userForToken, JWT_SECRET) }
+    },
   }
 }
 
 // 创建阿波罗服务器并启动
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: async ({ req }) => {
+    const auth = req ? req.headers.authorization : null
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7), JWT_SECRET
+      )
+      const currentUser = await User.findById(decodedToken.id).populate('friends')
+      return { currentUser }
+    }
+  }
 })
 
 server.listen().then(({ url }) => {
