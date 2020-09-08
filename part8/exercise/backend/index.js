@@ -152,7 +152,7 @@ const resolvers = {
       books = books.concat(book)
 
       if (!authors.some(author => author.name === book.author)) {
-        const author = { name: book.author }
+        const author = { name: book.author, id: uuid() }
         authors = authors.concat(author)
       }
 
