@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useQuery, useApolloClient } from '@apollo/client';
+import { useQuery, useApolloClient, useSubscription } from '@apollo/client';
 import Persons from './components/Persons';
 import PersonForm from './components/PersonForm';
 import PhoneForm from './components/PhoneForm';
 import Notify from './components/Notify';
 import LoginForm from './components/LoginForm';
-import { ALL_PERSONS } from './queries';
+import { ALL_PERSONS, PERSON_ADDED } from './queries';
 
 function App() {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -15,6 +15,27 @@ function App() {
   const result = useQuery(ALL_PERSONS, {
     // 每2秒查询一次数据，这个方式会浪费不必要的流量
     // pollInterval: 2000
+  })
+
+  const updateCacheWith = (addedPerson) => {
+    const includedIn = (set, object) =>
+      set.map(p => p.id).includes(object.id)
+
+    const dataInStore = client.readQuery({ query: ALL_PERSONS })
+    if (!includedIn(dataInStore.allPersons, addedPerson)) {
+      client.writeQuery({
+        query: ALL_PERSONS,
+        data: { allPersons: dataInStore.allPersons.concat(addedPerson) }
+      })
+    }
+  }
+
+  useSubscription(PERSON_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedPerson = subscriptionData.data.personAdded
+      notify(`${addedPerson.name} added`)
+      updateCacheWith(addedPerson)
+    }
   })
 
   if (result.loading) {
@@ -52,7 +73,7 @@ function App() {
       <button onClick={logout} >logout</button>
       <Notify errorMessage={errorMessage} />
       <Persons persons={result.data.allPersons}></Persons>
-      <PersonForm setError={notify}></PersonForm>
+      <PersonForm setError={notify} updateCacheWith={updateCacheWith}></PersonForm>
       <PhoneForm setError={notify}></PhoneForm>
     </div>
   );

@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@apollo/client@^3.1.4":
+"@apollo/client@^3.0.0-beta.23", "@apollo/client@^3.1.4":
   version "3.1.4"
   resolved "https://registry.npm.taobao.org/@apollo/client/download/@apollo/client-3.1.4.tgz#2848a9f29619275df9af55966c4f5984e31cea6e"
   integrity sha1-KEip8pYZJ135r1WWbE9ZhOMc6m4=
@@ -20,6 +20,14 @@
     ts-invariant "^0.4.4"
     tslib "^1.10.0"
     zen-observable "^0.8.14"
+
+"@apollo/link-ws@^2.0.0-beta.3":
+  version "2.0.0-beta.3"
+  resolved "https://registry.npm.taobao.org/@apollo/link-ws/download/@apollo/link-ws-2.0.0-beta.3.tgz#b0283c68516aa0caa82c4904f84eff639643b04b"
+  integrity sha1-sCg8aFFqoMqoLEkE+E7/Y5ZDsEs=
+  dependencies:
+    "@apollo/client" "^3.0.0-beta.23"
+    tslib "^1.9.3"
 
 "@apollo/protobufjs@^1.0.3":
   version "1.0.5"
@@ -14225,9 +14233,9 @@ stylehacks@^4.0.0:
     postcss "^7.0.0"
     postcss-selector-parser "^3.0.0"
 
-subscriptions-transport-ws@^0.9.11, subscriptions-transport-ws@^0.9.16:
+subscriptions-transport-ws@^0.9.11, subscriptions-transport-ws@^0.9.16, subscriptions-transport-ws@^0.9.18:
   version "0.9.18"
-  resolved "https://registry.npm.taobao.org/subscriptions-transport-ws/download/subscriptions-transport-ws-0.9.18.tgz#bcf02320c911fbadb054f7f928e51c6041a37b97"
+  resolved "https://registry.npm.taobao.org/subscriptions-transport-ws/download/subscriptions-transport-ws-0.9.18.tgz?cache=0&sync_timestamp=1597665574483&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fsubscriptions-transport-ws%2Fdownload%2Fsubscriptions-transport-ws-0.9.18.tgz#bcf02320c911fbadb054f7f928e51c6041a37b97"
   integrity sha1-vPAjIMkR+62wVPf5KOUcYEGje5c=
   dependencies:
     backo2 "^1.0.2"

@@ -1,4 +1,4 @@
-const { ApolloServer, UserInputError, gql } = require('apollo-server');
+const { ApolloServer, UserInputError, gql, PubSub } = require('apollo-server');
 const mongoose = require('mongoose')
 const Person = require('./models/person')
 const User = require('./models/user')
@@ -36,6 +36,7 @@ const typeDefs = gql`
     name: String!
     phone: String
     address: Address!
+    friendOf: [User!]!
     id: ID!
   }
 
@@ -73,11 +74,18 @@ const typeDefs = gql`
       password: String!
     ): Token
   }  
+
+  type Subscription {
+    personAdded: Person!
+  }
 `
 
 const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
+
+// 创建订阅发布器
+const pubsub = new PubSub()
 
 // 创建查询解析器
 const resolvers = {
@@ -88,6 +96,13 @@ const resolvers = {
         street: parent.street,
         city: parent.city
       }
+    },
+    friendOf: async (parent) => {
+      const friends = await User.find({
+        friends: parent._id
+      })
+
+      return friends
     }
   },
   Query: {
@@ -123,12 +138,15 @@ const resolvers = {
           invalidArgs: args,
         })
       }
+
+      pubsub.publish('PERSON_ADDED', { personAdded: person })
+
       return person
     },
     addAsFriend: async (root, args, { currentUser }) => {
       const nonFriendAlready = (person) =>
         !currentUser.friends.map(f => f._id).includes(person._id)
-        
+
       if (!currentUser) {
         throw new AuthenticationError("not authenticated")
       }
@@ -182,6 +200,11 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     },
+  },
+  Subscription: {
+    personAdded: {
+      subscribe: () => pubsub.asyncIterator(['PERSON_ADDED'])
+    }
   }
 }
 
@@ -201,6 +224,7 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`);
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`);
 })
