@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const Author = require('./models/author')
 const Book = require('./models/book')
 const User = require('./models/user')
+const AuthenticationError = require('./errors/authentication-error')
 
 const MONGODB_URI = 'mongodb://localhost/graphql-exercise?retryWrites=true'
 
@@ -120,7 +121,7 @@ const resolvers = {
         args.author = author._id
         const book = new Book({ ...args })
         await book.save()
-        return book
+        return Book.findOne({ _id: book._id }).populate('author')
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,

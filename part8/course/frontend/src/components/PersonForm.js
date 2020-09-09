@@ -9,7 +9,21 @@ const PersonForm = ({ setError }) => {
   const [city, setCity] = useState('')
 
   const [createPerson] = useMutation(CREATE_PERSON, {
-    refetchQueries: [{ query: ALL_PERSONS }],
+    // 重新向后端请求数据
+    // refetchQueries: [{ query: ALL_PERSONS }],
+
+    // 直接更新本地的缓存
+    update: (store, response) => {
+      const dataInStore = store.readQuery({ query: ALL_PERSONS })
+      store.writeQuery({
+        query: ALL_PERSONS,
+        data: {
+          ...dataInStore,
+          allPersons: [...dataInStore.allPersons, response.data.addPerson]
+        }
+      })
+    },
+
     onError: (error) => {
       setError(error.graphQLErrors[0].message)
     }
@@ -18,7 +32,14 @@ const PersonForm = ({ setError }) => {
   const submit = (event) => {
     event.preventDefault()
 
-    createPerson({ variables: { name, phone, street, city } })
+    createPerson({
+      variables: {
+        name,
+        phone: phone.length > 0 ? phone : null,
+        street,
+        city
+      }
+    })
 
     setName('')
     setPhone('')

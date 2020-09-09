@@ -45,7 +45,7 @@ const Authors = (props) => {
         </tbody>
       </table>
 
-      <h2>Set bithyear</h2>
+      <h2>Set birthyear</h2>
       <form onSubmit={submit}>
         <div>
           name
