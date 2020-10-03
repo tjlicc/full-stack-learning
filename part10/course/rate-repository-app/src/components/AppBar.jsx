@@ -1,8 +1,11 @@
-import React from 'react';
+import { useQuery, useApolloClient } from '@apollo/react-hooks';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import { Link } from "react-router-native";
+import { Link, useHistory } from "react-router-native";
+import { AUTHORIZED_USER } from '../graphql/queries';
 import theme from '../theme';
 import Text from './Text';
+import AuthStorageContext from '../contexts/AuthStorageContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -14,6 +17,21 @@ const styles = StyleSheet.create({
 });
 
 const AppBar = () => {
+  const authStorage = useContext(AuthStorageContext);
+  const apolloClient = useApolloClient();
+  const history = useHistory();
+
+  const { data } = useQuery(AUTHORIZED_USER, {
+    fetchPolicy: 'cache-and-network'
+  });
+  const user = data?.authorizedUser;
+
+  const logout = () => {
+    authStorage.removeAccessToken();
+    apolloClient.resetStore();
+    history.push('sign-in');
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView horizontal>
@@ -23,9 +41,18 @@ const AppBar = () => {
           </Link>
         </View>
         <View style={styles.tab}>
-          <Link to="/sign-in" component={TouchableWithoutFeedback}>
-            <Text color="light" fontSize="subheading">Sign in</Text>
-          </Link>
+          {
+            user ? (
+              <TouchableWithoutFeedback onPress={logout}>
+                <Text color="light" fontSize="subheading">Sign out</Text>
+              </TouchableWithoutFeedback>
+            ) : (
+                <Link to="/sign-in" component={TouchableWithoutFeedback}>
+                  <Text color="light" fontSize="subheading">Sign in</Text>
+                </Link>
+              )
+          }
+
         </View>
       </ScrollView>
     </View>

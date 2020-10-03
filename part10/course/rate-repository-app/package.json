@@ -11,9 +11,13 @@
     "lint": "eslint ./src/**/*.{js,jsx} App.js --no-error-on-unmatched-pattern"
   },
   "dependencies": {
+    "@apollo/react-hooks": "^4.0.0",
+    "apollo-boost": "^0.4.9",
+    "dotenv": "^8.2.0",
     "expo": "~39.0.2",
     "expo-status-bar": "~1.0.2",
     "formik": "^2.1.5",
+    "graphql": "^15.3.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.2.tar.gz",

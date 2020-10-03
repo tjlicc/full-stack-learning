@@ -5,6 +5,8 @@ import FormikTextInput from './FormikTextInput';
 import Text from './Text';
 import theme from '../theme';
 import * as yup from 'yup';
+import useSignIn from '../hooks/useSignIn';
+import { useHistory } from 'react-router-native';
 
 const initialValues = {
   username: '',
@@ -38,7 +40,7 @@ const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
       <FormikTextInput name="username" placeholder="Username"></FormikTextInput>
-      <FormikTextInput name="password" placeholder="Password" style={styles.mt10} securetextentry={true}></FormikTextInput>
+      <FormikTextInput name="password" placeholder="Password" style={styles.mt10} secureTextEntry={true}></FormikTextInput>
       <TouchableWithoutFeedback onPress={onSubmit}>
         <Text color="light" style={styles.btnPrimary}>Sign In</Text>
       </TouchableWithoutFeedback>
@@ -47,8 +49,17 @@ const SignInForm = ({ onSubmit }) => {
 };
 
 const SignIn = () => {
-  const onSubmit = (values) => {
-    console.log(values);
+  const [signIn] = useSignIn();
+  const history = useHistory();
+
+  const onSubmit = async (values) => {
+    const { username, password } = values;
+    try {
+      await signIn({ username, password });
+      history.push('/');
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
