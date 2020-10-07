@@ -39,12 +39,20 @@ const styles = StyleSheet.create({
 const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
-      <FormikTextInput name="username" placeholder="Username"></FormikTextInput>
-      <FormikTextInput name="password" placeholder="Password" style={styles.mt10} secureTextEntry={true}></FormikTextInput>
-      <TouchableWithoutFeedback onPress={onSubmit}>
+      <FormikTextInput name="username" placeholder="Username" testID="usernameField"></FormikTextInput>
+      <FormikTextInput name="password" placeholder="Password" testID="passwordField" style={styles.mt10} secureTextEntry={true}></FormikTextInput>
+      <TouchableWithoutFeedback onPress={onSubmit} testID="submitButton">
         <Text color="light" style={styles.btnPrimary}>Sign In</Text>
       </TouchableWithoutFeedback>
     </View>
+  );
+};
+
+export const SignInContainer = ({ onSubmit }) => {
+  return (
+    <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+    </Formik>
   );
 };
 
@@ -63,9 +71,7 @@ const SignIn = () => {
   };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
-    </Formik>
+    <SignInContainer onSubmit={onSubmit} />
   );
 };
 

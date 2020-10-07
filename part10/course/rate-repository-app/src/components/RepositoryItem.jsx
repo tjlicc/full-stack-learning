@@ -50,7 +50,7 @@ const RepositoryItem = ({ item }) => {
       <View style={styles.flexRow}>
         <Image source={{ uri: item.ownerAvatarUrl }} style={styles.image}></Image>
         <View>
-          <Text fontSize="subheading" fontWeight="bold">{item.fullName}</Text>
+          <Text fontSize="subheading" fontWeight="bold" testID="fullName">{item.fullName}</Text>
           <Text color="textSecondary">{item.description}</Text>
         </View>
       </View>
