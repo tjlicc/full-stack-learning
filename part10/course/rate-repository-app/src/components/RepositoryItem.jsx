@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, Button } from 'react-native';
+import * as Linking from 'expo-linking';
 import theme from '../theme';
 import Text from './Text';
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20
+    marginBottom: 10
   },
   flexRow: {
     flexDirection: 'row',
@@ -33,6 +34,10 @@ const styles = StyleSheet.create({
   },
   tagNumber: {
     marginBottom: 5
+  },
+  btnContainer: {
+    padding: 10,
+    paddingBottom: 0
   }
 });
 
@@ -44,7 +49,13 @@ const formatNum = (num = 0) => {
   }
 };
 
-const RepositoryItem = ({ item }) => {
+const RepositoryItem = ({ item, showLink }) => {
+  const linkBtn = showLink ? (
+    <View style={styles.btnContainer}>
+      <Button title="Open in Github" color={theme.colors.primary} onPress={() => Linking.openURL(item.url)}/>
+    </View>
+  ) : null;
+
   return (
     <View style={styles.container}>
       <View style={styles.flexRow}>
@@ -75,6 +86,7 @@ const RepositoryItem = ({ item }) => {
           <Text align="center" color="textSecondary">Rating</Text>
         </View>
       </View>
+      {linkBtn}
     </View >
   );
 };

@@ -1,25 +1,31 @@
 import React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, TouchableOpacity } from "react-native";
+import { useHistory } from "react-router-native";
 import useRepositories from "../hooks/useRepositories";
 import RepositoryItem from './RepositoryItem';
-
-const styles = StyleSheet.create({
-  separator: {
-    height: 10,
-    backgroundColor: '#ddd'
-  }
-});
-
-const ItemSeparator = () => <View style={styles.separator} />;
+import ItemSeparator from './ItemSeparator';
 
 export const RepositoryListContainer = ({ repositories }) => {
+  const history = useHistory();
+  const TouchableRepositoryItem = ({ item, ...props }) => {
+    const toDetail = () => {
+      history.push(`/${item.id}`);
+    };
+
+    return (
+      <TouchableOpacity onPress={toDetail}>
+        <RepositoryItem item={item} {...props} showLink={false} />
+      </TouchableOpacity>
+    );
+  };
+
   // Get the nodes from the edges array
   const repositoryNodes = repositories
     ? repositories.edges.map(edge => edge.node)
     : [];
 
   return (
-    <FlatList data={repositoryNodes} ItemSeparatorComponent={ItemSeparator} renderItem={RepositoryItem} />
+    <FlatList data={repositoryNodes} ItemSeparatorComponent={ItemSeparator} renderItem={TouchableRepositoryItem} />
   );
 };
 
