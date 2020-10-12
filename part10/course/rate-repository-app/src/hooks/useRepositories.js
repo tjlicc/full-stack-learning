@@ -32,7 +32,7 @@ const useRepositories = () => {
   const { data, error, loading } = useQuery(GET_REPOSITORIES, {
     fetchPolicy: 'cache-and-network'
   });
-
+console.log(data);
   return {
     repositories: data?.repositories,
     error, loading

@@ -32,6 +32,33 @@ const AppBar = () => {
     history.push('sign-in');
   };
 
+  const TabsAfterSignIn = () => {
+    return (
+      <>
+        <View style={styles.tab}>
+          <Link to="/create-review" component={TouchableWithoutFeedback}>
+            <Text color="light" fontSize="subheading">Create a review</Text>
+          </Link>
+        </View>
+        <View style={styles.tab}>
+          <TouchableWithoutFeedback onPress={logout}>
+            <Text color="light" fontSize="subheading">Sign out</Text>
+          </TouchableWithoutFeedback>
+        </View>
+      </>
+    );
+  };
+
+  const TabsBeforeSignIn = () => {
+    return (
+      <View style={styles.tab}>
+        <Link to="/sign-in" component={TouchableWithoutFeedback}>
+          <Text color="light" fontSize="subheading">Sign in</Text>
+        </Link>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView horizontal>
@@ -40,20 +67,9 @@ const AppBar = () => {
             <Text color="light" fontSize="subheading">Repositories</Text>
           </Link>
         </View>
-        <View style={styles.tab}>
-          {
-            user ? (
-              <TouchableWithoutFeedback onPress={logout}>
-                <Text color="light" fontSize="subheading">Sign out</Text>
-              </TouchableWithoutFeedback>
-            ) : (
-                <Link to="/sign-in" component={TouchableWithoutFeedback}>
-                  <Text color="light" fontSize="subheading">Sign in</Text>
-                </Link>
-              )
-          }
-
-        </View>
+        {
+          user ? <TabsAfterSignIn /> : <TabsBeforeSignIn />
+        }
       </ScrollView>
     </View>
   );

@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: circleRadius,
     borderColor: theme.colors.primary,
+    lineHeight: circleRadius * 2 - 5,
     textAlign: 'center',
     textAlignVertical: 'center'
   }

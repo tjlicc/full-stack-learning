@@ -8,19 +8,19 @@ class AuthStorage {
 
   getAccessToken() {
     // Get the access token for the storage
-    const rawToken = AsyncStorage.getItem(this.tokenKey);
+    const rawToken = AsyncStorage?.getItem(this.tokenKey);
 
     return rawToken || '';
   }
 
   setAccessToken(accessToken) {
     // Add the access token to the storage
-    AsyncStorage.setItem(this.tokenKey, accessToken);
+    AsyncStorage?.setItem(this.tokenKey, accessToken);
   }
 
   removeAccessToken() {
     // Remove the access token from the storage
-    AsyncStorage.removeItem(this.tokenKey);
+    AsyncStorage?.removeItem(this.tokenKey);
   }
 }
 
