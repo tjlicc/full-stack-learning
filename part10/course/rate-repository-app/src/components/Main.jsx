@@ -4,6 +4,7 @@ import { View, StyleSheet } from "react-native";
 import AppBar from "./AppBar";
 import RepositoryList from "./RepositoryList";
 import SignIn from "./SignIn";
+import SignUp from "./SignUp";
 import ReviewForm from "./ReviewForm";
 import { Redirect, Route, Switch } from "react-router-native";
 import RepositoryDetail from "./RepositoryDetail";
@@ -26,6 +27,9 @@ const Main = () => {
         </Route>
         <Route path="/sign-in" exact>
           <SignIn />
+        </Route>
+        <Route path="/sign-up" exact>
+          <SignUp />
         </Route>
         <Route path="/create-review" exact>
           <ReviewForm />

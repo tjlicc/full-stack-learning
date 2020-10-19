@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const SignInForm = ({ onSubmit }) => {
+const FormInner = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
       <FormikTextInput name="ownerName" placeholder="Repository owner name" testID="ownerNameField"></FormikTextInput>
@@ -56,7 +56,7 @@ const SignInForm = ({ onSubmit }) => {
 export const ReviewFormContainer = ({ onSubmit }) => {
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+      {({ handleSubmit }) => <FormInner onSubmit={handleSubmit} />}
     </Formik>
   );
 };
@@ -70,7 +70,6 @@ const ReviewForm = () => {
     rating = parseInt(rating);
     try {
       const repositoryId = await createReview({ ownerName, repositoryName, rating, text });
-      console.log(repositoryId);
       history.push('/' + repositoryId);
     } catch (e) {
       console.log(e);

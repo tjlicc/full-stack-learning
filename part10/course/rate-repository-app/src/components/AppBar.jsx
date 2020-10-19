@@ -51,11 +51,18 @@ const AppBar = () => {
 
   const TabsBeforeSignIn = () => {
     return (
-      <View style={styles.tab}>
-        <Link to="/sign-in" component={TouchableWithoutFeedback}>
-          <Text color="light" fontSize="subheading">Sign in</Text>
-        </Link>
-      </View>
+      <>
+        <View style={styles.tab}>
+          <Link to="/sign-in" component={TouchableWithoutFeedback}>
+            <Text color="light" fontSize="subheading">Sign in</Text>
+          </Link>
+        </View>
+        <View style={styles.tab}>
+          <Link to="/sign-up" component={TouchableWithoutFeedback}>
+            <Text color="light" fontSize="subheading">Sign up</Text>
+          </Link>
+        </View>
+      </>
     );
   };
 
